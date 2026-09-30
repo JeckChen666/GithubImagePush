@@ -127,6 +127,34 @@ curl -X DELETE -H "X-API-Key: YOUR_KEY" "http://127.0.0.1:8080/api/delete?path=i
 - API 地址：`http://127.0.0.1:8080/upload`
 - 请求头：`{"X-API-Key": "YOUR_KEY"}`
 
+## 作为 AI Agent Skill 使用
+
+仓库自带 [`skills/github-image-push/`](skills/github-image-push/)，安装后本地 AI Agent（ZCode / Claude Code 等支持 Agent Skills 的工具）即可在你提到"传图/图床/图片外链"时自动调用命令上传图片：
+
+```bash
+# 1. 安装 skill 到个人 skill 目录
+cp -r skills/github-image-push ~/.agents/skills/
+
+# 2. 写入本地配置（key 等私有信息只存在这里，不进仓库）
+mkdir -p ~/.config/github-image-push
+cat > ~/.config/github-image-push/env <<'EOF'
+GIP_URL=http://127.0.0.1:8080
+GIP_KEY=YOUR_KEY
+GIP_BIN=/path/to/github-image-push      # 供 --start 自动拉起服务（可选）
+GIP_CONFIG=/path/to/config.yaml         # 可选
+EOF
+```
+
+脚本也可以直接当命令行工具用：
+
+```bash
+~/.agents/skills/github-image-push/upload.sh photo.png            # 输出直链
+~/.agents/skills/github-image-push/upload.sh -f markdown a.png    # 输出 ![](url)
+~/.agents/skills/github-image-push/upload.sh --start a.png b.jpg  # 服务未运行时自动启动
+```
+
+配置优先级：命令行参数 > 环境变量 > `~/.config/github-image-push/env`。详见 [SKILL.md](skills/github-image-push/SKILL.md)。
+
 ## 配置说明
 
 完整带注释的配置见 [config.example.yaml](config.example.yaml)。要点：
