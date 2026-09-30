@@ -1,0 +1,17 @@
+# 真实配置含 token 与访问 key，切勿提交
+config.yaml
+config.json
+
+# 构建产物
+/github-image-push
+github-image-push-*
+dist/
+*.exe
+
+# IDE / 编辑器 / 本地工具
+.idea/
+.vscode/
+.v2c/
+
+# 系统文件
+.DS_Store

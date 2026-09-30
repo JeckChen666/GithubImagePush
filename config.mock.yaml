@@ -1,0 +1,20 @@
+# 本地联调配置：配合 mockgh 使用，无需真实 GitHub token
+#   1) go run ./cmd/mockgh -addr 127.0.0.1:9999 -token goodtoken
+#   2) ./github-image-push -config config.mock.yaml
+server:
+  addr: "127.0.0.1:8080"
+
+auth:
+  keys:
+    - "demo-key-123"
+
+github:
+  token: "goodtoken"
+  repo: "demo/images"
+  branch: "main"
+  path: "img"
+  pathTemplate: "{year}/{month}/{day}"
+  filenameStrategy: "timestamp"
+  onConflict: "error"
+  urlFormat: "raw"
+  apiURL: "http://127.0.0.1:9999"

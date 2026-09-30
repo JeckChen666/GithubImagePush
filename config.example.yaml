@@ -1,0 +1,69 @@
+# ============================================================
+# GithubImagePush 配置文件
+# 复制为 config.yaml 后修改；YAML 缩进必须用空格
+# ============================================================
+
+server:
+  # 监听地址。仅本机访问用 127.0.0.1:8080；局域网/公网访问改为 0.0.0.0:8080
+  addr: "127.0.0.1:8080"
+  # 单文件大小上限（字节）。GitHub Contents API 上限为 100MB，不建议超过 50MB
+  maxUploadSize: 26214400   # 25MB
+
+auth:
+  # 访问 Key 列表，支持多个（方便分发与吊销）。
+  # API 调用：Authorization: Bearer <key> 或 X-API-Key: <key> 或 ?key=<key>
+  # 网页使用：在页面右上角输入其中任意一个 Key
+  keys:
+    - "please-change-me-to-a-long-random-string"
+
+github:
+  # GitHub Personal Access Token
+  # 创建入口：Settings -> Developer settings -> Personal access tokens
+  #   - Fine-grained token：只授权目标仓库的 Contents: Read and write，最安全（推荐）
+  #   - Classic token：勾选 repo 权限（私有仓库必须）
+  token: "ghp_xxxxxxxxxxxxxxxxxxxx"
+
+  # 目标仓库，格式 owner/repo（需要你对该仓库有写权限）
+  repo: "your-username/images"
+
+  # 分支名（新仓库默认 main）
+  branch: "main"
+
+  # 仓库内的根目录前缀，图片都会传到这个目录下；留空表示仓库根目录
+  path: "img"
+
+  # 根目录下的子目录模板，支持变量 {year} {month} {day} {timestamp} {rand}
+  # 例如 img/2026/09/30/xxx.png；留空则不分子目录
+  pathTemplate: "{year}/{month}/{day}"
+
+  # 文件命名策略：
+  #   timestamp —— "20260930152345-a1b2c3d4.png"（默认，几乎不会重名）
+  #   original  —— 保留原始文件名（重名时按 onConflict 处理）
+  filenameStrategy: "timestamp"
+
+  # 同名文件已存在时的处理：
+  #   error     —— 返回报错并附上已有文件的链接（默认）
+  #   overwrite —— 覆盖旧文件（多一次 API 请求获取 sha）
+  onConflict: "error"
+
+  # Git 提交信息
+  commitMessage: "Upload by GithubImagePush"
+
+  # 上传成功后默认返回的链接格式：
+  #   raw      —— https://raw.githubusercontent.com/{repo}/{branch}/{path}（默认，私仓需 token 访问）
+  #   jsdelivr —— https://cdn.jsdelivr.net/gh/{repo}@{branch}/{path}（CDN 加速，仅支持公开仓库、文件 < 20MB）
+  #   github   —— https://github.com/{repo}/raw/{branch}/{path}
+  #   custom   —— 使用下方 customUrl 拼接
+  # 无论选哪种，API 响应中都会包含全部可用格式的链接
+  urlFormat: "raw"
+
+  # 自定义域名（urlFormat 为 custom 时必填）。
+  # 支持 {path} 占位符；不含占位符时按前缀拼接，兼容 PicGo 习惯。
+  # 例： "https://cdn.example.com/your-repo" 或 "https://cdn.example.com/{path}"
+  customUrl: ""
+
+  # GitHub API 地址。国内可换成反代地址；GitHub Enterprise 填自己的 API 地址
+  apiURL: "https://api.github.com"
+
+  # 允许上传的扩展名（小写、不带点）
+  allowExtensions: ["png", "jpg", "jpeg", "gif", "webp", "svg", "bmp", "ico", "avif"]
