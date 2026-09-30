@@ -171,18 +171,27 @@ func TestUploadMultipart(t *testing.T) {
 	if len(items) != 2 {
 		t.Fatalf("应上传 2 个文件，实际 %d", len(items))
 	}
-	first := items[0]
-	if first["success"] != true {
-		t.Fatalf("首个文件失败: %v", first)
+	// multipart 字段来自 map 遍历，顺序不确定：按后缀定位 png 项
+	var png map[string]any
+	for _, it := range items {
+		if strings.HasSuffix(it["url"].(string), ".png") {
+			png = it
+		}
 	}
-	url := first["url"].(string)
-	if !strings.HasPrefix(url, "https://raw.githubusercontent.com/someone/images/main/img/") || !strings.HasSuffix(url, ".png") {
+	if png == nil {
+		t.Fatalf("未找到 png 上传项: %v", items)
+	}
+	if png["success"] != true {
+		t.Fatalf("png 文件失败: %v", png)
+	}
+	url := png["url"].(string)
+	if !strings.HasPrefix(url, "https://raw.githubusercontent.com/someone/images/main/img/") {
 		t.Errorf("url = %q", url)
 	}
-	if !strings.Contains(first["markdown"].(string), url) {
+	if !strings.Contains(png["markdown"].(string), url) {
 		t.Errorf("markdown 应包含 url")
 	}
-	urls := first["urls"].(map[string]any)
+	urls := png["urls"].(map[string]any)
 	if urls["jsdelivr"] == "" || urls["github"] == "" {
 		t.Errorf("urls 应包含多格式: %v", urls)
 	}
