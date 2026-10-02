@@ -84,7 +84,7 @@ func TestHealthzAndWebPage(t *testing.T) {
 	if resp.StatusCode != 200 || !strings.Contains(string(page), "GithubImagePush") {
 		t.Errorf("首页异常: %d", resp.StatusCode)
 	}
-	for _, asset := range []string{"/style.css", "/app.js", "/favicon.svg"} {
+	for _, asset := range []string{"/style.css", "/app.js", "/favicon.png", "/logo.png"} {
 		resp, _, _ = doReq(t, "GET", ts.URL+asset, nil, nil)
 		if resp.StatusCode != 200 {
 			t.Errorf("静态资源 %s: %d", asset, resp.StatusCode)

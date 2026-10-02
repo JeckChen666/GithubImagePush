@@ -3,6 +3,13 @@
   "use strict";
 
   var LS_KEY = "gip_key";
+  var LS_THEME = "gip_theme";
+  var THEMES = [
+    { id: "emerald", name: "翡翠绿 · 清新", short: "翡翠绿", from: "#059669", to: "#14b8a6" },
+    { id: "sunset", name: "珊瑚落日 · 活力", short: "珊瑚落日", from: "#f97316", to: "#f43f5e" },
+    { id: "violet", name: "紫罗兰 · 优雅", short: "紫罗兰", from: "#8b5cf6", to: "#d946ef" },
+    { id: "graphite", name: "石墨极简 · 中性", short: "石墨", from: "#3f3f46", to: "#a1a1aa" },
+  ];
   var state = {
     key: localStorage.getItem(LS_KEY) || "",
     config: null,        // /api/verify 返回的配置摘要
@@ -36,8 +43,16 @@
     return n.toFixed(1) + " " + units[i];
   }
 
+  var TOAST_ICON = {
+    ok: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>',
+    err: '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>',
+    "": '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>',
+  };
+
   function toast(msg, type) {
-    var t = el("div", { class: "toast " + (type || ""), text: msg });
+    var t = el("div", { class: "toast " + (type || "") });
+    t.innerHTML = TOAST_ICON[type] || TOAST_ICON[""];
+    t.appendChild(el("span", { text: msg }));
     $("#toastWrap").appendChild(t);
     setTimeout(function () { t.remove(); }, 3200);
   }
@@ -130,6 +145,103 @@
     setAuthed(false);
     toast("已清除本地 Key");
   });
+
+  // Mac 触控设备显示 ⌘ 而非 Ctrl
+  if (/Mac|iP(hone|ad|od)/.test(navigator.platform || navigator.userAgent || "")) {
+    $("#pasteKey").textContent = "⌘";
+  }
+
+  /* ---------- 配色主题 ---------- */
+
+  var themeBtn = $("#themeBtn");
+  var themeMenu = $("#themeMenu");
+
+  // 浏览器地址栏/状态栏颜色跟随主题
+  var THEME_CHROME = {
+    emerald: { light: "#059669", dark: "#0a100e" },
+    sunset: { light: "#f97316", dark: "#120d0a" },
+    violet: { light: "#8b5cf6", dark: "#0e0b16" },
+    graphite: { light: "#f4f4f5", dark: "#0b0b0d" },
+  };
+  var darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+  function syncThemeChrome() {
+    var chrome = THEME_CHROME[currentThemeId()] || THEME_CHROME.emerald;
+    var metas = document.querySelectorAll('meta[name="theme-color"]');
+    var value = darkScheme.matches ? chrome.dark : chrome.light;
+    metas.forEach(function (m) { m.setAttribute("content", value); });
+  }
+  if (darkScheme.addEventListener) {
+    darkScheme.addEventListener("change", syncThemeChrome);
+  }
+
+  function currentThemeId() {
+    return document.documentElement.dataset.theme || "emerald";
+  }
+
+  function applyTheme(id, persist) {
+    if (id === "emerald") {
+      document.documentElement.removeAttribute("data-theme");
+    } else {
+      document.documentElement.dataset.theme = id;
+    }
+    if (persist) {
+      try { localStorage.setItem(LS_THEME, id); } catch (e) { /* ignore */ }
+    }
+    var cur = THEMES.filter(function (t) { return t.id === id; })[0] || THEMES[0];
+    $("#themeBtnLabel").textContent = cur.short;
+    syncThemeChrome();
+  }
+
+  function closeThemeMenu() {
+    themeMenu.classList.add("hidden");
+    themeBtn.setAttribute("aria-expanded", "false");
+  }
+
+  function buildThemeMenu() {
+    var cur = currentThemeId();
+    themeMenu.innerHTML = "";
+    THEMES.forEach(function (t) {
+      var item = el("button", {
+        class: "theme-item" + (t.id === cur ? " active" : ""),
+        role: "menuitem", type: "button",
+      });
+      item.innerHTML =
+        '<span class="dot" style="background:linear-gradient(135deg,' + t.from + "," + t.to + ')"></span>' +
+        '<span></span>' +
+        '<svg class="check" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>';
+      item.children[1].textContent = t.name;
+      item.addEventListener("click", function () {
+        applyTheme(t.id, true);
+        closeThemeMenu();
+        toast("已切换配色：" + t.name, "ok");
+      });
+      themeMenu.appendChild(item);
+    });
+  }
+
+  themeBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    if (themeMenu.classList.contains("hidden")) {
+      buildThemeMenu();
+      themeMenu.classList.remove("hidden");
+      themeBtn.setAttribute("aria-expanded", "true");
+    } else {
+      closeThemeMenu();
+    }
+  });
+  document.addEventListener("click", function (e) {
+    if (!themeMenu.classList.contains("hidden") && !$("#themeSwitch").contains(e.target)) closeThemeMenu();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeThemeMenu();
+  });
+
+  // 应用主题：URL 参数优先，其次上次记忆的选择
+  var urlTheme = (location.search.match(/[?&]theme=(emerald|sunset|violet|graphite)\b/) || [])[1];
+  var storedTheme = null;
+  try { storedTheme = localStorage.getItem(LS_THEME); } catch (e) { /* ignore */ }
+  applyTheme(urlTheme || storedTheme || "emerald", false);
 
   /* ---------- Tab 切换 ---------- */
 
@@ -300,7 +412,7 @@
         renderBreadcrumb(state.galleryDir);
         renderGallery();
       } else {
-        $("#galleryEmpty").textContent = err.message;
+        $("#galleryEmptyText").textContent = err.message;
         $("#galleryEmpty").classList.remove("hidden");
       }
     });
@@ -343,6 +455,9 @@
     ]);
   }
 
+  var ICON_COPY = '<svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg>';
+  var ICON_TRASH = '<svg viewBox="0 0 24 24" width="15" height="15"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>';
+
   function fileCard(entry) {
     var img = el("img", { loading: "lazy", alt: entry.name, src: entry.url });
     img.addEventListener("error", function () {
@@ -354,10 +469,11 @@
     });
     var overlay = el("div", { class: "g-overlay" }, [
       el("button", {
-        text: "复制", onclick: function (e) { e.stopPropagation(); copyText(entry.url); },
+        title: "复制链接", "aria-label": "复制链接", html: ICON_COPY,
+        onclick: function (e) { e.stopPropagation(); copyText(entry.url); },
       }),
       el("button", {
-        class: "del", text: "删除",
+        class: "del", title: "删除", "aria-label": "删除", html: ICON_TRASH,
         onclick: function (e) { e.stopPropagation(); confirmDelete(entry); },
       }),
     ]);

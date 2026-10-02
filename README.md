@@ -1,5 +1,9 @@
 # GithubImagePush
 
+<p align="center">
+  <img src="docs/logo.png" width="140" alt="GithubImagePush logo" />
+</p>
+
 [![CI](https://github.com/JeckChen666/GithubImagePush/actions/workflows/ci.yml/badge.svg)](https://github.com/JeckChen666/GithubImagePush/actions/workflows/ci.yml)
 [![Go](https://img.shields.io/badge/Go-1.22%2B-00ADD8?logo=go&logoColor=white)](https://go.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)

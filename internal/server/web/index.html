@@ -5,17 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="no-referrer" />
   <title>GithubImagePush · GitHub 图床</title>
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#059669" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0a100e" media="(prefers-color-scheme: dark)" />
+  <link rel="icon" type="image/png" href="/favicon.png?v=3" />
+  <link rel="apple-touch-icon" href="/favicon.png?v=3" />
   <link rel="stylesheet" href="/style.css" />
+  <script>
+    /* 配色主题：URL ?theme= 优先，其次记忆的上次选择；在首屏绘制前应用避免闪烁 */
+    (function () {
+      var m = location.search.match(/[?&]theme=(emerald|sunset|violet|graphite)\b/);
+      var t = m ? m[1] : "";
+      if (!t) { try { t = localStorage.getItem("gip_theme") || ""; } catch (e) {} }
+      if (t && t !== "emerald") document.documentElement.dataset.theme = t;
+    })();
+  </script>
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand">
-        <svg class="logo" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
-          <path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.72.5.1.68-.22.68-.49 0-.24-.01-.87-.01-1.7-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.35 1.12 2.92.85.09-.66.35-1.12.63-1.37-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05a9.3 9.3 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.6.69.49A10.25 10.25 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z"/>
-          <image href="/favicon.svg" x="13" y="13" width="11" height="11"/>
-        </svg>
+        <span class="logo-badge">
+          <img src="/logo.png" alt="GithubImagePush logo" width="34" height="34" />
+        </span>
         <div>
           <h1>GithubImagePush</h1>
           <p class="subtitle">GitHub 图床 · 图片转链接</p>
@@ -23,6 +34,15 @@
       </div>
 
       <div class="auth-box" id="authBox">
+        <!-- 配色主题切换 -->
+        <div class="theme-switch" id="themeSwitch">
+          <button class="btn ghost small" id="themeBtn" aria-haspopup="menu" aria-expanded="false" title="切换配色主题">
+            <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10c1.38 0 2.5-1.12 2.5-2.5 0-.61-.23-1.2-.64-1.67-.08-.1-.13-.21-.13-.33 0-.28.22-.5.5-.5H16c3.31 0 6-2.69 6-6 0-4.96-4.49-9-10-9Zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 8 6.5 8 8 8.67 8 9.5 7.33 11 6.5 11Zm3-4C8.67 7 8 6.33 8 5.5S8.67 4 9.5 4s1.5.67 1.5 1.5S10.33 7 9.5 7Zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 4 14.5 4s1.5.67 1.5 1.5S15.33 7 14.5 7Zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 8 17.5 8s1.5.67 1.5 1.5-.67 1.5-1.5 1.5Z"/></svg>
+            <span id="themeBtnLabel">翡翠绿</span>
+            <svg class="caret" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
+          </button>
+          <div class="theme-menu hidden" id="themeMenu" role="menu" aria-label="配色主题"></div>
+        </div>
         <!-- 未鉴权：输入 Key -->
         <div class="auth-form" id="authForm">
           <input type="password" id="keyInput" placeholder="输入访问 Key…" autocomplete="off" spellcheck="false" />
@@ -49,10 +69,12 @@
     <!-- ============ 上传 ============ -->
     <section id="tab-upload" class="tabpanel">
       <div class="card dropzone" id="dropzone" tabindex="0" role="button" aria-label="选择或拖拽图片上传">
-        <svg viewBox="0 0 24 24" width="46" height="46" aria-hidden="true">
-          <path fill="currentColor" d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 2v9.5l4-4 3.5 3.5L16 9l3 3V6H5Zm3 1.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"/>
-        </svg>
-        <p class="dz-main">点击选择、拖拽图片到此处，或 <kbd>Ctrl</kbd>+<kbd>V</kbd> 粘贴截图</p>
+        <div class="dz-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="34" height="34">
+            <path fill="currentColor" d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+          </svg>
+        </div>
+        <p class="dz-main">点击选择、拖拽图片到此处，或 <kbd id="pasteKey">Ctrl</kbd>+<kbd>V</kbd> 粘贴截图</p>
         <p class="dz-sub" id="dzHint">支持多选 · 上传后自动生成多种格式链接</p>
         <input type="file" id="fileInput" multiple accept="image/*" hidden />
       </div>
@@ -70,7 +92,14 @@
         </button>
       </div>
       <div class="gallery-grid" id="galleryGrid"></div>
-      <div class="empty hidden" id="galleryEmpty">此目录暂无内容</div>
+      <div class="empty hidden" id="galleryEmpty">
+        <div class="empty-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="34" height="34">
+            <path fill="currentColor" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+          </svg>
+        </div>
+        <p id="galleryEmptyText">此目录暂无内容</p>
+      </div>
     </section>
   </main>
 
@@ -95,7 +124,7 @@
   <div class="toast-wrap" id="toastWrap"></div>
 
   <footer class="footer">
-    <span>GithubImagePush · 参考 <a href="https://github.com/Molunerfinn/PicGo" target="_blank" rel="noopener">PicGo</a> 的 GitHub 图床实现</span>
+    <span><img class="footer-logo" src="/logo.png" alt="" width="16" height="16" />GithubImagePush · 参考 <a href="https://github.com/Molunerfinn/PicGo" target="_blank" rel="noopener">PicGo</a> 的 GitHub 图床实现</span>
   </footer>
 
   <script src="/app.js"></script>
