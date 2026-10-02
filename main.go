@@ -19,7 +19,7 @@ import (
 	"githubimagepush/internal/server"
 )
 
-var version = "1.0.0"
+var version = "1.0.1"
 
 func main() {
 	configPath := flag.String("config", "config.yaml", "配置文件路径（YAML，兼容 JSON）")
