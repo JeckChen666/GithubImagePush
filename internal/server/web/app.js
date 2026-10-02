@@ -16,6 +16,7 @@
     galleryDir: "",      // 当前图库目录（仓库相对路径）
     galleryData: [],     // 当前目录条目
     modalEntry: null,    // 弹层当前条目
+    skillGuide: "",      // /api/skill 返回的完整指南
   };
 
   /* ---------- 基础工具 ---------- */
@@ -251,6 +252,7 @@
       document.querySelectorAll(".tabpanel").forEach(function (p) { p.classList.add("hidden"); });
       $("#tab-" + tab.dataset.tab).classList.remove("hidden");
       if (tab.dataset.tab === "gallery") loadGallery();
+      if (tab.dataset.tab === "skill") loadSkill();
     });
   });
 
@@ -540,7 +542,52 @@
     modal.classList.remove("hidden");
   }
 
+  /* ---------- Skill 接入 ---------- */
+
+  function loadSkill() {
+    var authed = !!state.key;
+    $("#skillAuth").classList.toggle("hidden", authed);
+    $("#skillBody").classList.toggle("hidden", !authed);
+    if (!authed) return;
+    api("/api/skill").then(function (data) {
+      state.skillGuide = data.guide || "";
+      $("#skillUrl").value = data.baseUrl || location.origin;
+      $("#skillKeyVal").value = state.key;
+      $("#skillRepo").value = state.config && state.config.repo ? state.config.repo + "@" + state.config.branch : "";
+      $("#skillApiLink").href = "/api/skill?key=" + encodeURIComponent(state.key);
+      $("#skillGuide").textContent = state.skillGuide;
+    }).catch(function (err) {
+      toast(err.message, "err");
+    });
+  }
+
+  $("#skillCopyUrl").addEventListener("click", function () { copyText($("#skillUrl").value); });
+  $("#skillCopyKey").addEventListener("click", function () { copyText($("#skillKeyVal").value); });
+  $("#skillCopyRepo").addEventListener("click", function () { copyText($("#skillRepo").value); });
+  $("#skillCopyGuide").addEventListener("click", function () {
+    if (state.skillGuide) copyText(state.skillGuide);
+    else toast("指南尚未加载，请稍后重试", "err");
+  });
+  $("#skillCopyPrompt").addEventListener("click", function () {
+    if (!state.key) { toast("请先输入访问 Key", "err"); return; }
+    copyText("请把 GithubImagePush 图床技能安装并配置到这台电脑：执行 curl -s \"" +
+      $("#skillUrl").value + "/api/skill?key=" + encodeURIComponent(state.key) +
+      "\" 获取配置指南（JSON，guide 字段为完整 Markdown），严格按指南完成安装与配置，最后用一张测试图片验证上传并向我汇报结果。");
+  });
+
   /* ---------- 启动 ---------- */
+
+  // URL 携带 ?key= 时自动保存并从地址栏清除，方便 AI Agent / 分享链接直达
+  try {
+    var sp = new URLSearchParams(location.search);
+    if (sp.get("key")) {
+      state.key = sp.get("key");
+      localStorage.setItem(LS_KEY, state.key);
+      sp.delete("key");
+      var qs = sp.toString();
+      history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash);
+    }
+  } catch (e) { /* ignore */ }
 
   tryAuth(true);
 })();

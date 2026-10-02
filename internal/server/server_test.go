@@ -92,6 +92,49 @@ func TestHealthzAndWebPage(t *testing.T) {
 	}
 }
 
+func TestSkillGuide(t *testing.T) {
+	ts, _ := newTestServer(t, nil)
+	url := ts.URL + "/api/skill"
+
+	// 未携带 key 应 401
+	resp, _, _ := doReq(t, "GET", url, nil, nil)
+	if resp.StatusCode != 401 {
+		t.Errorf("未鉴权访问 /api/skill: %d, 期望 401", resp.StatusCode)
+	}
+
+	// 携带 key：回显 key、base_url 与可执行指南
+	resp, body, _ := doReq(t, "GET", url+"?key="+testKey, nil, nil)
+	if resp.StatusCode != 200 || body["success"] != true {
+		t.Fatalf("/api/skill: %d %v", resp.StatusCode, body)
+	}
+	data, _ := body["data"].(map[string]any)
+	if data == nil {
+		t.Fatal("data 字段缺失")
+	}
+	if data["key"] != testKey {
+		t.Errorf("key 回显不符: %v", data["key"])
+	}
+	if data["baseUrl"] != ts.URL {
+		t.Errorf("baseUrl 不符: %v", data["baseUrl"])
+	}
+	guide, _ := data["guide"].(string)
+	for _, want := range []string{testKey, ts.URL, "upload.sh", "SKILL.md", "~/.config/github-image-push/env", "someone/images"} {
+		if !strings.Contains(guide, want) {
+			t.Errorf("指南缺少 %q", want)
+		}
+	}
+	// 模板占位符不应残留
+	if strings.Contains(guide, "{{") {
+		t.Error("指南中残留未替换的占位符")
+	}
+
+	// X-API-Key 头方式同样可用且回显该 key
+	resp, body, _ = doReq(t, "GET", url, nil, withKey(nil))
+	if resp.StatusCode != 200 || body["data"].(map[string]any)["key"] != testKey {
+		t.Errorf("X-API-Key 方式请求失败: %d", resp.StatusCode)
+	}
+}
+
 func TestAuthVariants(t *testing.T) {
 	ts, _ := newTestServer(t, nil)
 	url := ts.URL + "/api/verify"

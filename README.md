@@ -30,6 +30,7 @@
 - **上传**：multipart 表单 / JSON base64（含 `data:image/png;base64,` 前缀）两种输入，多文件、进度条、粘贴（Ctrl+V）上传
 - **链接格式**：`raw` / `jsdelivr` CDN / `github` / 自定义域名（支持 `{path}` 占位符，兼容 PicGo 的前缀拼接习惯），一次上传全部返回
 - **图库管理**：目录导航、缩略图网格（私有仓库自动经服务端代理加载）、详情弹层（Markdown/HTML/BBCode/各格式链接复制）、删除
+- **AI Agent 一键接入**：网页内置"Skill 接入"页 + `GET /api/skill` 指南接口（鉴权后返回含服务地址、Key 与完整安装步骤的 Markdown 指南），AI Agent 按步骤即可自动完成本机技能配置
 - **命名与冲突策略**：时间戳命名（默认，防同名）或保留原名；同名可报错（附已有链接）或覆盖
 - **兼容 PicGo 生态**：`POST /upload` 输出 `{success, result: [...]}`，可直接配置到 PicGo/Typora 等的自定义 Web Uploader
 

@@ -445,6 +445,18 @@ kbd {
 }
 .link-row-item input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--ring); }
 
+/* ---------- Skill 接入页 ---------- */
+.skill-info { padding: 16px 18px; margin-bottom: 14px; }
+.skill-rows { display: flex; flex-direction: column; gap: 8px; }
+.skill-note { margin: 12px 0 0; font-size: 13px; }
+.skill-actions { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.skill-guide {
+  margin: 0; padding: 18px 20px; font-size: 12.5px; line-height: 1.65;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: pre-wrap; word-break: break-word;
+  max-height: 72vh; overflow: auto;
+}
+
 /* ---------- Toast / Footer ---------- */
 .toast-wrap {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);

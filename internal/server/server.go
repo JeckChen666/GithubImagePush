@@ -44,6 +44,7 @@ func (s *Server) Handler() http.Handler {
 
 	// 需要鉴权的 API
 	mux.HandleFunc("GET /api/verify", s.auth(s.handleVerify))
+	mux.HandleFunc("GET /api/skill", s.auth(s.handleSkill))
 	mux.HandleFunc("POST /api/upload", s.auth(s.handleUpload))
 	mux.HandleFunc("GET /api/list", s.auth(s.handleList))
 	mux.HandleFunc("DELETE /api/delete", s.auth(s.handleDelete))

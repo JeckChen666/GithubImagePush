@@ -64,6 +64,7 @@
     <nav class="tabs">
       <button class="tab active" data-tab="upload">上传</button>
       <button class="tab" data-tab="gallery">图库</button>
+      <button class="tab" data-tab="skill">Skill 接入</button>
     </nav>
 
     <!-- ============ 上传 ============ -->
@@ -101,6 +102,47 @@
         <p id="galleryEmptyText">此目录暂无内容</p>
       </div>
     </section>
+
+    <!-- ============ Skill 接入（供 AI Agent 读取的配置指南，需鉴权） ============ -->
+    <section id="tab-skill" class="tabpanel hidden">
+      <div class="empty hidden" id="skillAuth">
+        <div class="empty-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="34" height="34">
+            <path fill="currentColor" d="M18 8h-1V6a5 5 0 0 0-10 0v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zm-6 9a2 2 0 1 1 2-2 2 2 0 0 1-2 2zm3.1-9H8.9V6a3.1 3.1 0 0 1 6.2 0z"/>
+          </svg>
+        </div>
+        <p>Skill 配置指南包含访问 Key，请先在右上角输入 Key 完成鉴权后查看</p>
+      </div>
+
+      <div id="skillBody" class="hidden">
+        <div class="card skill-info">
+          <div class="skill-rows">
+            <div class="link-row-item">
+              <label>服务地址</label>
+              <input readonly id="skillUrl" />
+              <button class="btn ghost small" id="skillCopyUrl">复制</button>
+            </div>
+            <div class="link-row-item">
+              <label>访问 Key</label>
+              <input readonly id="skillKeyVal" />
+              <button class="btn ghost small" id="skillCopyKey">复制</button>
+            </div>
+            <div class="link-row-item">
+              <label>图床仓库</label>
+              <input readonly id="skillRepo" />
+              <button class="btn ghost small" id="skillCopyRepo">复制</button>
+            </div>
+          </div>
+          <p class="muted skill-note">把下面的指南交给 AI Agent，或直接复制「一句话提示语」发给它，即可自动完成本机配置。</p>
+          <div class="skill-actions">
+            <button class="btn primary" id="skillCopyGuide">复制完整配置指南</button>
+            <button class="btn ghost" id="skillCopyPrompt">复制给 AI Agent 的一句话</button>
+            <a class="btn ghost" id="skillApiLink" target="_blank" rel="noopener">查看 /api/skill 原始返回</a>
+          </div>
+        </div>
+        <pre class="card skill-guide" id="skillGuide"></pre>
+      </div>
+    </section>
   </main>
 
   <!-- 图片详情弹层 -->
@@ -124,7 +166,7 @@
   <div class="toast-wrap" id="toastWrap"></div>
 
   <footer class="footer">
-    <span><img class="footer-logo" src="/logo.png" alt="" width="16" height="16" />GithubImagePush · 参考 <a href="https://github.com/Molunerfinn/PicGo" target="_blank" rel="noopener">PicGo</a> 的 GitHub 图床实现</span>
+    <span><img class="footer-logo" src="/logo.png" alt="" width="16" height="16" />GithubImagePush · <a href="https://github.com/JeckChen666/GithubImagePush" target="_blank" rel="noopener">GitHub 开源仓库</a> · 参考 <a href="https://github.com/Molunerfinn/PicGo" target="_blank" rel="noopener">PicGo</a> 的 GitHub 图床实现</span>
   </footer>
 
   <script src="/app.js"></script>
