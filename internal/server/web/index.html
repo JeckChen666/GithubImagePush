@@ -43,15 +43,10 @@
           </button>
           <div class="theme-menu hidden" id="themeMenu" role="menu" aria-label="配色主题"></div>
         </div>
-        <!-- 未鉴权：输入 Key -->
-        <div class="auth-form" id="authForm">
-          <input type="password" id="keyInput" placeholder="输入访问 Key…" autocomplete="off" spellcheck="false" />
-          <button class="btn primary" id="saveKeyBtn">验证并保存</button>
-        </div>
-        <!-- 已鉴权：状态 -->
+        <!-- 已鉴权：状态（未鉴权时由 app.js 跳转到独立登录页 /login） -->
         <div class="auth-ok hidden" id="authOk">
           <span class="chip ok" id="authChip">已鉴权</span>
-          <button class="btn ghost small" id="logoutBtn" title="清除本地保存的 Key">退出</button>
+          <button class="btn ghost small" id="logoutBtn" title="退出登录并清除本地保存的 Key">退出</button>
         </div>
       </div>
     </div>
@@ -111,7 +106,7 @@
             <path fill="currentColor" d="M18 8h-1V6a5 5 0 0 0-10 0v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zm-6 9a2 2 0 1 1 2-2 2 2 0 0 1-2 2zm3.1-9H8.9V6a3.1 3.1 0 0 1 6.2 0z"/>
           </svg>
         </div>
-        <p>Skill 配置指南包含访问 Key，请先在右上角输入 Key 完成鉴权后查看</p>
+        <p>Skill 配置指南包含访问 Key，请先在登录页完成鉴权后查看</p>
       </div>
 
       <div id="skillBody" class="hidden">

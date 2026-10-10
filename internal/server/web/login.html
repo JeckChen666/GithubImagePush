@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <title>登录 · GithubImagePush</title>
+  <meta name="theme-color" content="#059669" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0a100e" media="(prefers-color-scheme: dark)" />
+  <link rel="icon" type="image/png" href="/favicon.png?v=3" />
+  <link rel="apple-touch-icon" href="/favicon.png?v=3" />
+  <link rel="stylesheet" href="/style.css" />
+  <script>
+    /* 配色主题：URL ?theme= 优先，其次记忆的上次选择；在首屏绘制前应用避免闪烁 */
+    (function () {
+      var m = location.search.match(/[?&]theme=(emerald|sunset|violet|graphite)\b/);
+      var t = m ? m[1] : "";
+      if (!t) { try { t = localStorage.getItem("gip_theme") || ""; } catch (e) {} }
+      if (t && t !== "emerald") document.documentElement.dataset.theme = t;
+    })();
+  </script>
+</head>
+<body class="login-page">
+  <main class="login-wrap">
+    <form class="card login-card" id="loginCard">
+      <div class="login-logo" aria-hidden="true">
+        <img src="/logo.png" alt="" width="52" height="52" />
+      </div>
+      <h1>GithubImagePush</h1>
+      <p class="login-sub">GitHub 图床 · 输入访问 Key 登录</p>
+
+      <div class="login-error hidden" id="loginError" role="alert"></div>
+
+      <div class="login-field">
+        <input type="password" id="loginKey" name="key" placeholder="访问 Key（config.yaml · auth.keys）"
+               autocomplete="current-password" spellcheck="false" autofocus />
+        <button type="button" class="login-eye" id="eyeBtn" aria-label="显示或隐藏 Key" title="显示 / 隐藏 Key">
+          <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M12 5c-5 0-9.3 3.1-11 7.5C2.7 16.9 7 20 12 20s9.3-3.1 11-7.5C21.3 8.1 17 5 12 5Zm0 12.5a5 5 0 1 1 0-10 5 5 0 0 1 0 10Zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/></svg>
+        </button>
+      </div>
+
+      <button class="btn primary login-btn" id="loginBtn" type="submit">登 录</button>
+
+      <p class="login-hint">Key 在服务端 <code>config.yaml</code> 的 <code>auth.keys</code> 中配置，支持多个；验证通过后仅保存在当前浏览器，不会存储到服务端。</p>
+    </form>
+
+    <p class="login-foot">
+      <a href="https://github.com/JeckChen666/GithubImagePush" target="_blank" rel="noopener">GithubImagePush</a> · 轻量 GitHub 图床
+    </p>
+  </main>
+
+  <script src="/login.js"></script>
+</body>
+</html>

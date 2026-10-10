@@ -87,7 +87,12 @@
     }
     return fetch(path, opts).then(function (res) {
       return res.json().catch(function () { return {}; }).then(function (body) {
-        if (res.status === 401) { setAuthed(false); throw new Error(body.message || "Key 无效或已过期，请重新输入"); }
+        if (res.status === 401) {
+          var e = new Error(body.message || "登录已失效，请重新登录");
+          e.auth = true;
+          sessionExpired();
+          throw e;
+        }
         if (!res.ok || body.success === false) { throw new Error(body.message || ("请求失败 (HTTP " + res.status + ")")); }
         return body.data;
       });
@@ -96,8 +101,24 @@
 
   /* ---------- 鉴权 ---------- */
 
+  function clearKey() {
+    state.key = "";
+    try { localStorage.removeItem(LS_KEY); } catch (e) { /* ignore */ }
+  }
+
+  // 跳转到独立登录页，携带当前地址便于登录后回跳
+  function gotoLogin() {
+    var next = location.pathname + location.search + location.hash;
+    location.replace("/login?next=" + encodeURIComponent(next));
+  }
+
+  // 会话失效（本地无 Key 或服务端拒绝）：清除 Key 并回到登录页
+  function sessionExpired() {
+    clearKey();
+    gotoLogin();
+  }
+
   function setAuthed(ok, info) {
-    $("#authForm").classList.toggle("hidden", ok);
     $("#authOk").classList.toggle("hidden", !ok);
     if (ok) {
       $("#authChip").textContent = "已鉴权 · " + (info || "");
@@ -125,26 +146,20 @@
   }
 
   function tryAuth(silent) {
-    if (!state.key) { setAuthed(false); return; }
+    if (!state.key) { sessionExpired(); return; }
     loadConfig().catch(function (err) {
+      if (err && err.auth) { sessionExpired(); return; }
+      // 网络/服务异常：留在当前页提示，避免误踢回登录页
       setAuthed(false);
+      $("#cfgAlert").textContent = err.message;
+      $("#cfgAlert").classList.remove("hidden");
       if (!silent) toast(err.message, "err");
     });
   }
 
-  $("#saveKeyBtn").addEventListener("click", function () {
-    var v = $("#keyInput").value.trim();
-    if (!v) { toast("请输入 Key", "err"); return; }
-    state.key = v;
-    localStorage.setItem(LS_KEY, v);
-    tryAuth(false);
-  });
-  $("#keyInput").addEventListener("keydown", function (e) { if (e.key === "Enter") $("#saveKeyBtn").click(); });
   $("#logoutBtn").addEventListener("click", function () {
-    state.key = "";
-    localStorage.removeItem(LS_KEY);
-    setAuthed(false);
-    toast("已清除本地 Key");
+    clearKey();
+    location.replace("/login");
   });
 
   // Mac 触控设备显示 ⌘ 而非 Ctrl
@@ -290,7 +305,7 @@
   var uploading = false;
 
   function enqueueFiles(files) {
-    if (!state.key) { toast("请先输入访问 Key", "err"); return; }
+    if (!state.key) { sessionExpired(); return; }
     var imgs = files.filter(function (f) { return f.type.startsWith("image/") || /\.(png|jpe?g|gif|webp|svg|bmp|ico|avif)$/i.test(f.name); });
     if (!imgs.length) { toast("没有可上传的图片文件", "err"); return; }
     imgs.forEach(function (f) {
@@ -345,8 +360,8 @@
         try { body = JSON.parse(xhr.responseText); } catch (e) { /* ignore */ }
         var item = body.data && body.data[0];
         if (xhr.status === 401) {
-          setAuthed(false);
-          fail(ui, "Key 无效或已过期，请重新输入");
+          sessionExpired();
+          fail(ui, "登录已失效，请重新登录");
           return resolve();
         }
         if (item && item.success) {
@@ -569,7 +584,7 @@
     else toast("指南尚未加载，请稍后重试", "err");
   });
   $("#skillCopyPrompt").addEventListener("click", function () {
-    if (!state.key) { toast("请先输入访问 Key", "err"); return; }
+    if (!state.key) { sessionExpired(); return; }
     copyText("请把 GithubImagePush 图床技能安装并配置到这台电脑：执行 curl -s \"" +
       $("#skillUrl").value + "/api/skill?key=" + encodeURIComponent(state.key) +
       "\" 获取配置指南（JSON，guide 字段为完整 Markdown），严格按指南完成安装与配置，最后用一张测试图片验证上传并向我汇报结果。");

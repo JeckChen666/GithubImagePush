@@ -143,14 +143,6 @@ kbd {
 .brand h1 { font-size: 17px; margin: 0; line-height: 1.25; letter-spacing: .1px; }
 .subtitle { margin: 0; font-size: 12px; color: var(--muted); }
 
-.auth-form { display: flex; gap: 8px; }.auth-form input {
-  width: 240px; padding: 9px 14px; border: 1px solid var(--border); border-radius: 10px;
-  background: color-mix(in srgb, var(--card) 72%, var(--bg));
-  color: var(--text); font-size: 14px; outline: none;
-  transition: border-color .15s, box-shadow .15s;
-}
-.auth-form input::placeholder { color: color-mix(in srgb, var(--muted) 80%, transparent); }
-.auth-form input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--ring); }
 .auth-ok { display: flex; align-items: center; gap: 10px; }
 .auth-box { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
@@ -457,6 +449,71 @@ kbd {
   max-height: 72vh; overflow: auto;
 }
 
+/* ---------- 独立登录页（/login） ---------- */
+body.login-page { justify-content: center; align-items: center; }
+.login-wrap {
+  width: 420px; max-width: 100%;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 24px 16px;
+  animation: fadeUp .3s cubic-bezier(.22, .8, .36, 1);
+}
+.login-card {
+  width: 100%; padding: 36px 32px 26px; text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+.login-logo {
+  width: 64px; height: 64px; margin: 0 auto 14px; border-radius: 18px;
+  background: #fff; border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-md); overflow: hidden;
+}
+.login-logo img { display: block; width: 52px; height: 52px; object-fit: contain; }
+.login-card h1 { margin: 0 0 4px; font-size: 20px; letter-spacing: .2px; }
+.login-sub { margin: 0 0 22px; font-size: 13.5px; color: var(--muted); }
+.login-error {
+  display: flex; align-items: flex-start; gap: 8px; text-align: left;
+  padding: 10px 14px; margin-bottom: 14px; border-radius: 10px; font-size: 13.5px;
+  background: var(--danger-weak); color: var(--danger);
+  border: 1px solid color-mix(in srgb, var(--danger) 26%, transparent);
+  word-break: break-all;
+}
+.login-field { position: relative; margin-bottom: 12px; }
+.login-field input {
+  width: 100%; padding: 11px 44px 11px 14px;
+  border: 1px solid var(--border); border-radius: 11px;
+  background: color-mix(in srgb, var(--card) 72%, var(--bg));
+  color: var(--text); font-size: 14.5px; font-family: inherit; outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.login-field input::placeholder { color: color-mix(in srgb, var(--muted) 80%, transparent); }
+.login-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--ring); }
+.login-eye {
+  position: absolute; top: 50%; right: 7px; transform: translateY(-50%);
+  width: 32px; height: 32px; border: none; border-radius: 8px; cursor: pointer;
+  background: transparent; color: var(--muted);
+  display: flex; align-items: center; justify-content: center;
+  transition: color .15s, background .15s;
+}
+.login-eye:hover { color: var(--text); background: var(--accent-softer); }
+.login-eye:disabled { opacity: .5; cursor: not-allowed; }
+.login-btn { width: 100%; padding: 11px 16px; font-size: 15px; border-radius: 11px; }
+.login-hint { margin: 18px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+.login-hint code {
+  padding: 1px 6px; border-radius: 6px; background: var(--accent-softer); color: var(--accent);
+  font-size: 11.5px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.login-foot { margin: 18px 0 0; font-size: 12.5px; color: var(--muted); }
+.login-foot a { color: inherit; font-weight: 500; }
+.login-foot a:hover { color: var(--accent); }
+
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+.login-card.shake { animation: shake .5s cubic-bezier(.36, .07, .19, .97); }
+
 /* ---------- Toast / Footer ---------- */
 .toast-wrap {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
@@ -498,8 +555,8 @@ kbd {
 
 @media (max-width: 640px) {
   .topbar-inner { padding: 10px 16px; }
-  .auth-form input { width: 150px; }
   .container { padding: 20px 16px 48px; }
+  .login-card { padding: 28px 22px 22px; }
   .dropzone { padding: 40px 16px; }
   .modal-card { border-radius: 14px; }
   .upload-item { flex-direction: column; }

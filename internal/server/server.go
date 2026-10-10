@@ -54,6 +54,14 @@ func (s *Server) Handler() http.Handler {
 	// 输入与 /api/upload 相同，输出为 {success, result: [url...]} 形式。
 	mux.HandleFunc("POST /upload", s.auth(s.handleUploadPicGo))
 
+	// 独立登录页（/login 与 /login.html 等价，路径更友好）
+	if loginHTML, err := webFiles.ReadFile("web/login.html"); err == nil {
+		mux.HandleFunc("GET /login", func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			_, _ = w.Write(loginHTML)
+		})
+	}
+
 	// 内嵌前端页面与静态资源（/ 交给 FileServer，命中 index.html）
 	webFS, _ := fs.Sub(webFiles, "web")
 	mux.Handle("GET /", http.FileServerFS(webFS))

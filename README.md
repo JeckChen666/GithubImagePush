@@ -25,7 +25,7 @@
 - **单二进制**：Go 标准库 HTTP 服务，前端页面 `embed` 内嵌，无外部文件依赖，交叉编译即可部署
 - **双形式访问**：
   - **API**：`Authorization: Bearer <key>` / `X-API-Key: <key>` / `?key=<key>` 三种携带方式
-  - **网页**：页面右上角输入 Key 即可使用（存于浏览器 localStorage，不落服务端）
+  - **网页**：独立登录页（`/login`）输入 Key 登录后即可使用（未登录访问首页自动跳转；Key 存于浏览器 localStorage，不落服务端）
 - **Key 由配置文件管理**：支持多 Key（方便分发与吊销），常量时间比较，按 IP 限速防暴力枚举
 - **上传**：multipart 表单 / JSON base64（含 `data:image/png;base64,` 前缀）两种输入，多文件、进度条、粘贴（Ctrl+V）上传
 - **链接格式**：`raw` / `jsdelivr` CDN / `github` / 自定义域名（支持 `{path}` 占位符，兼容 PicGo 的前缀拼接习惯），一次上传全部返回

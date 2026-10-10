@@ -12,7 +12,7 @@ server:
 auth:
   # 访问 Key 列表，支持多个（方便分发与吊销）。
   # API 调用：Authorization: Bearer <key> 或 X-API-Key: <key> 或 ?key=<key>
-  # 网页使用：在页面右上角输入其中任意一个 Key
+  # 网页使用：在登录页（/login）输入其中任意一个 Key
   keys:
     - "please-change-me-to-a-long-random-string"
 
