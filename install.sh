@@ -30,13 +30,12 @@ case "$(uname -m)" in
     *) die "不支持的架构：$(uname -m)" ;;
 esac
 
-fetch() { # fetch <url> <输出文件>
+fetch() { # fetch <url> <输出文件>（带超时、断点续传、自动重试）
     if command -v curl >/dev/null 2>&1; then
-        curl -fsSL "$1" -o "$2"
-    elif command -v wget >/dev/null 2>&1; then
-        wget -qO "$2" "$1"
+        curl -fsSL --connect-timeout 15 --max-time 600 \
+            --retry 5 --retry-delay 2 --retry-all-errors -C - "$1" -o "$2"
     else
-        die "系统缺少 curl 或 wget，请先安装"
+        wget -q --timeout=15 --tries=5 -c -O "$2" "$1"
     fi
 }
 
@@ -52,6 +51,8 @@ fi
 log "最新版本：$TAG"
 
 URL="https://github.com/$REPO/releases/download/$TAG/$BINARY-linux-$ARCH"
+# 国内网络慢时可用镜像前缀，如：MIRROR=https://ghproxy.net/ bash install.sh
+URL="${MIRROR:-}${URL}"
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 
