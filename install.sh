@@ -2,7 +2,9 @@
 # GithubImagePush 一键安装/更新脚本
 #
 # 首次安装或更新到最新版（保留服务器上的 config.yaml）：
-#   curl -fsSL https://raw.githubusercontent.com/JeckChen666/GithubImagePush/main/install.sh | sudo bash
+#   curl -fsSL https://cdn.jsdelivr.net/gh/JeckChen666/GithubImagePush@main/install.sh | sudo bash
+# 国内网络高峰期下载慢时，走镜像加速：
+#   curl -fsSL https://cdn.jsdelivr.net/gh/JeckChen666/GithubImagePush@main/install.sh | MIRROR=https://ghproxy.net/ sudo bash
 #
 # 行为说明：
 #   - 从 GitHub Releases 下载与本机架构匹配的最新二进制（linux amd64/arm64）
@@ -57,7 +59,14 @@ TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 log "下载 $URL"
-fetch "$URL" "$TMP_DIR/$BINARY"
+if command -v curl >/dev/null 2>&1; then
+    # 大文件：带进度条（stderr），断点续传 + 重试
+    curl -fL --progress-bar --connect-timeout 15 --max-time 600 \
+        --retry 5 --retry-delay 2 --retry-all-errors -C - "$URL" -o "$TMP_DIR/$BINARY" ||
+        die "下载失败：$URL（国内网络高峰期可用 MIRROR 环境变量走镜像，见脚本头注释）"
+else
+    fetch "$URL" "$TMP_DIR/$BINARY" || die "下载失败：$URL"
+fi
 chmod +x "$TMP_DIR/$BINARY"
 
 FIRST_INSTALL=0
