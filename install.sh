@@ -47,7 +47,7 @@ fetch() { # fetch <url> <输出文件>（带超时、断点续传、自动重试
     fi
 }
 
-CURL_COMMON=(-fL --progress-bar --connect-timeout 15 --max-time 600 --retry 5 --retry-delay 2 --retry-all-errors)
+CURL_COMMON=(-fL --progress-bar --connect-timeout 15 --max-time 600 --retry 5 --retry-delay 2 --retry-all-errors --speed-limit 2048 --speed-time 20)
 
 # ———————— 解析最新版本 ————————
 if [ -n "${GITEE_TOKEN:-}" ]; then
