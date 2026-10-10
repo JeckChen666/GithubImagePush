@@ -55,35 +55,3 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: out/*
-      - name: Upload linux binaries to Gitee release（国内加速）
-        if: startsWith(matrix.goos, 'linux')
-        env:
-          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
-        run: |
-          BASE="https://gitee.com/api/v5/repos/jeckchen666/GithubImagePush"
-          RID=$(curl -s -X POST "$BASE/releases" \
-            -d "access_token=$GITEE_TOKEN" -d "tag_name=${GITHUB_REF_NAME}" \
-            -d "target_commitish=main" -d "name=GithubImagePush ${GITHUB_REF_NAME}" \
-            -d "body=Linux 二进制见附件；其他平台请到 GitHub Releases 下载" \
-            | grep -m1 '"id"' | grep -o '[0-9]\+' || true)
-          if [ -z "$RID" ]; then
-            RID=$(curl -s -H "Authorization: token $GITEE_TOKEN" \
-              "$BASE/releases/tags/${GITHUB_REF_NAME}" | grep -m1 '"id"' | grep -o '[0-9]\+')
-          fi
-          echo "Gitee release id: $RID"
-          curl -s -X POST "$BASE/releases/$RID/attach_files" \
-            -F "access_token=$GITEE_TOKEN" -F "file=@out/github-image-push-linux-${{ matrix.goarch }}" >/dev/null
-
-  sync-gitee:
-    name: Mirror to Gitee
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Push main and tags to Gitee
-        run: |
-          git remote add gitee "https://oauth2:${{ secrets.GITEE_TOKEN }}@gitee.com/jeckchen666/GithubImagePush.git"
-          git push gitee origin/main:refs/heads/main --force
-          git push gitee origin --tags --force
